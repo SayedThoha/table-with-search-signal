@@ -1,11 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Service } from '@angular/core';
 import { User } from '../dto/users.dto';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class UserList {
   private http = inject(HttpClient);
   private apiUrl: string = 'https://jsonplaceholder.typicode.com/users';
