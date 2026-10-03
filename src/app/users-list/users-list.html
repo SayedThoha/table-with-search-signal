@@ -1,0 +1,134 @@
+<div class="table-card">
+  <!-- Card Header -->
+  <div class="card-header">
+    <div class="header-info">
+      <div class="header-title-row">
+        <h2 class="table-title">Users Directory</h2>
+        <span class="count-badge">{{ filteredUsers().length }} users</span>
+      </div>
+      <p class="table-subtitle">Explore and search user profiles loaded from API</p>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-box">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="text"
+        placeholder="Search name, username, email, city..."
+        [value]="searchQuery()"
+        (input)="onSearch($event)"
+        class="search-input"
+      />
+      @if (searchQuery()) {
+        <button class="clear-btn" (click)="clearSearch()" type="button" aria-label="Clear search">✕</button>
+      }
+    </div>
+  </div>
+
+  <!-- Table Viewport -->
+  <div class="table-responsive">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th class="col-id">#</th>
+          <th class="col-user">User</th>
+          <th class="col-handle">Username</th>
+          <th class="col-email">Email</th>
+          <th class="col-city">City</th>
+          <th class="col-website">Website</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (userListStore.loading()) {
+          @for (item of [1, 2, 3, 4, 5]; track item) {
+            <tr class="skeleton-row">
+              <td><div class="skeleton skeleton-badge"></div></td>
+              <td>
+                <div class="user-cell">
+                  <div class="skeleton skeleton-avatar"></div>
+                  <div class="user-text">
+                    <div class="skeleton skeleton-line short"></div>
+                    <div class="skeleton skeleton-line tiny"></div>
+                  </div>
+                </div>
+              </td>
+              <td><div class="skeleton skeleton-pill"></div></td>
+              <td><div class="skeleton skeleton-line medium"></div></td>
+              <td><div class="skeleton skeleton-line short"></div></td>
+              <td><div class="skeleton skeleton-line short"></div></td>
+            </tr>
+          }
+        } @else {
+          @for (user of filteredUsers(); track user.id) {
+            <tr class="user-row">
+              <td class="col-id">
+                <span class="id-badge">{{ user.id }}</span>
+              </td>
+              <td class="col-user">
+                <div class="user-cell">
+                  <div class="user-avatar" [style.background]="'hsl(' + (user.id * 47) % 360 + ', 65%, 45%)'">
+                    {{ user.name.charAt(0) }}
+                  </div>
+                  <div class="user-text">
+                    <span class="user-name">{{ user.name }}</span>
+                    <span class="user-company">{{ user.company?.name }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="col-handle">
+                <span class="handle-tag">@{{ user.username }}</span>
+              </td>
+              <td class="col-email">
+                <a [href]="'mailto:' + user.email" class="email-link">
+                  <svg class="email-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                  </svg>
+                  <span>{{ user.email }}</span>
+                </a>
+              </td>
+              <td class="col-city">
+                <span class="city-badge">{{ user.address?.city }}</span>
+              </td>
+              <td class="col-website">
+                <a [href]="'https://' + user.website" target="_blank" rel="noopener noreferrer" class="website-link">
+                  <span>{{ user.website }}</span>
+                  <svg class="external-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-content">
+                  <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                  </svg>
+                  <h3>No users found</h3>
+                  <p>No results match "{{ searchQuery() }}". Try adjusting your search query.</p>
+                  <button class="reset-btn" (click)="clearSearch()">Clear search</button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="card-footer">
+    <span class="footer-summary">
+      Showing <strong>{{ filteredUsers().length }}</strong> of <strong>{{ userListStore.users().length }}</strong> registered users
+    </span>
+  </div>
+</div>
