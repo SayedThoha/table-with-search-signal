@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { User } from '../dto/users.dto';
 import { UserList } from '../services/user-list';
 
@@ -8,6 +8,7 @@ import { UserList } from '../services/user-list';
 export class UserListStore {
   users = signal<User[]>([]);
   loading = signal<boolean>(false);
+  searchQuery = signal<string>('');
 
   constructor(private userListService: UserList) {}
 
@@ -25,8 +26,32 @@ export class UserListStore {
     });
   }
 
+  filteredUsers = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const users = this.users();
+    if (!query) return users;
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(query) ||
+        user.username.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        user.company?.name.toLowerCase().includes(query) ||
+        user.address?.city.toLowerCase().includes(query),
+    );
+  });
+
+  onSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+  }
+
   resetEntireState(): void {
     this.users.set([]);
     this.loading.set(false);
+    this.searchQuery.set('');
   }
 }
